@@ -60,11 +60,11 @@ class StackedFactorGraph:
             group_key: GroupKey = (
                 # (1) Treedef. Note that variables can be different as long as their
                 # types are the same.
-                jax.tree_structure(factor.anonymize_variables()),
+                jax.tree_util.tree_structure(factor.anonymize_variables()),
                 # (2) Leaf shapes: contained array shapes must match
                 tuple(
                     leaf.shape if hasattr(leaf, "shape") else ()
-                    for leaf in jax.tree_leaves(factor)
+                    for leaf in jax.tree_util.tree_leaves(factor)
                 ),
             )
 

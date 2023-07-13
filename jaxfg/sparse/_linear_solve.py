@@ -6,6 +6,7 @@ import jax.experimental.host_callback as hcb
 import jax_dataclasses as jdc
 import numpy as onp
 import sksparse
+from sksparse import cholmod
 from jax import numpy as jnp
 from overrides import EnforceOverrides, overrides
 
@@ -33,7 +34,7 @@ class _LinearSolverArgs(NamedTuple):
     lambd: hints.Scalar
 
 
-_cholmod_analyze_cache: Dict[Hashable, sksparse.cholmod.Factor] = {}
+_cholmod_analyze_cache: Dict[Hashable, cholmod.Factor] = {}
 
 
 @jdc.pytree_dataclass
@@ -77,7 +78,7 @@ class CholmodSolver(LinearSubproblemSolverBase):
         # Cache sparsity pattern analysis
         self_hash = object.__hash__(self)
         if self_hash not in _cholmod_analyze_cache:
-            _cholmod_analyze_cache[self_hash] = sksparse.cholmod.analyze_AAt(A_T_scipy)
+            _cholmod_analyze_cache[self_hash] = cholmod.analyze_AAt(A_T_scipy)
 
         # Factorize and solve
         _cholmod_analyze_cache[self_hash].cholesky_AAt_inplace(
